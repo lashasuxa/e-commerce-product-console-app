@@ -2,8 +2,18 @@
   "name": "e-commerce-product-console-app",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
+    "product:save": "node scripts/product-save.js",
+    "product:purchase": "node scripts/product-purchase.js",
+    "product:order": "node scripts/product-order.js",
+    "product:average-price": "node scripts/product-average-price.js",
+    "product:profit": "node scripts/product-profit.js",
+    "product:fewest": "node scripts/product-fewest.js",
+    "product:popular": "node scripts/product-popular.js",
+    "product:quantity": "node scripts/product-get-quantity.js",
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,7 +22,9 @@
   "dependencies": {
     "dotenv": "^16.3.1",
     "inquirer": "^9.2.7",
+    "mongodb": "^5.7.0",
     "mongoose": "^7.3.2",
+    "prompt": "^1.3.0",
     "yargs": "^17.7.2"
   }
 }
