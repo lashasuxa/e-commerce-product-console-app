@@ -1,14 +1,20 @@
-import { Schema, model } from "mongoose";
+import mongoose from "mongoose";
+import AutoIncrementFactory from "mongoose-sequence";
 
-const productSchema = new Schema({
-  id: { type: Number, required: true, unique: true },
+const autoIncrementFactory = AutoIncrementFactory(mongoose.connection);
+
+const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
   price: { type: Number, required: true },
-  quantity: { type: Number, default: 0 },
-  averagePrice: { type: Number, default: 0 },
-  orderQuantity: { type: Number, default: 0 },
 });
 
-const Product = model("Product", productSchema);
+productSchema.plugin(autoIncrementFactory.plugin, {
+  model: "Product",
+  field: "id",
+  startAt: 1,
+  incrementBy: 1,
+});
+
+const Product = mongoose.model("Product", productSchema);
 
 export default Product;

@@ -14,55 +14,42 @@ const connect = async () => {
   }
 };
 
-connect();
-
-const schema = {
-  properties: {
-    name: {
-      description: "Product name",
-      type: "string",
-      required: true,
+const saveProduct = async () => {
+  const schema = {
+    properties: {
+      name: {
+        description: "Product name",
+        type: "string",
+        required: true,
+      },
+      price: {
+        description: "Product price",
+        type: "number",
+        required: true,
+      },
     },
-    price: {
-      description: "Product price",
-      type: "number",
-      required: true,
-    },
-    id: {
-      description: "Product id",
-      type: "number",
-      required: true,
-    },
-  },
-};
+  };
 
-prompt.start();
+  prompt.start();
 
-prompt.get(schema, async function (err, result) {
-  if (err) {
-    console.log(err);
-    return;
-  }
+  prompt.get(schema, async function (err, result) {
+    if (err) {
+      console.log(err);
+      return;
+    }
 
-  try {
-    const product = await Product.findOne({ id: result.id });
-
-    if (product) {
-      product.name = result.name;
-      product.price = result.price;
-      await product.save();
-      console.log("Product updated!");
-    } else {
+    try {
       const newProduct = new Product({
-        id: result.id,
         name: result.name,
         price: result.price,
       });
       await newProduct.save();
       console.log("Product saved!");
-      process.exit();
+    } catch (error) {
+      console.error("Error occurred while saving the product:", error);
     }
-  } catch (error) {
-    console.error("Error occurred while saving the product:", error);
-  }
-});
+  });
+};
+
+connect();
+saveProduct();
