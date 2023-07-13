@@ -39,12 +39,20 @@ const saveProduct = async () => {
     }
 
     try {
-      const newProduct = new Product({
-        name: result.name,
-        price: result.price,
-      });
-      await newProduct.save();
-      console.log("Product saved!");
+      const existingProduct = await Product.findOne({ name: result.name });
+
+      if (existingProduct) {
+        existingProduct.price = result.price;
+        await existingProduct.save();
+        console.log("Product updated!");
+      } else {
+        const newProduct = new Product({
+          name: result.name,
+          price: result.price,
+        });
+        await newProduct.save();
+        console.log("Product saved!");
+      }
     } catch (error) {
       console.error("Error occurred while saving the product:", error);
     }
