@@ -1,5 +1,6 @@
 import prompt from "prompt";
 import Product from "../models/product.js";
+import Purchase from "../models/purchase.js";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 dotenv.config();
@@ -14,54 +15,54 @@ const connect = async () => {
   }
 };
 
-connect();
-
-const schema = {
-  properties: {
-    quantity: {
-      description: "Product quantity",
-      type: "number",
-      required: true,
+const purchaseProduct = async () => {
+  const schema = {
+    properties: {
+      productId: {
+        description: "Product ID",
+        type: "number",
+        required: true,
+      },
+      quantity: {
+        description: "Product quantity",
+        type: "number",
+        required: true,
+      },
     },
-    price: {
-      description: "Product price",
-      type: "number",
-      required: true,
-    },
-    productId: {
-      description: "Product ID",
-      type: "number",
-      required: true,
-    },
-  },
-};
+  };
 
-prompt.start();
+  prompt.start();
 
-prompt.get(schema, async function (err, result) {
-  if (err) {
-    console.log(err);
-    return;
-  }
-
-  try {
-    const product = await Product.findOne({ id: result.productId });
-
-    if (!product) {
-      console.log("Product not found");
-      process.exit();
+  prompt.get(schema, async function (err, result) {
+    if (err) {
+      console.log(err);
+      return;
     }
 
-    const totalPrice = result.quantity * result.price;
-    console.log(`Total purchase amount: ${totalPrice}`);
+    try {
+      const product = await Product.findOne({ id: result.productId });
 
-    // Update product quantity and save it to the database
-    product.quantity -= result.quantity;
-    await product.save();
+      if (!product) {
+        console.log("Product not found");
+        return;
+      }
 
-    console.log("Product purchased successfully!");
-    process.exit();
-  } catch (error) {
-    console.error("Error occurred while purchasing the product:", error);
-  }
-});
+      const totalPrice = result.quantity * product.price;
+      console.log(`Total purchase amount: ${totalPrice}`);
+
+      const purchase = new Purchase({
+        productId: result.productId,
+        quantity: result.quantity,
+        price: product.price,
+      });
+      await purchase.save();
+
+      console.log("Product added to cart successfully!");
+    } catch (error) {
+      console.error("Error occurred while adding the product to cart:", error);
+    }
+  });
+};
+
+connect();
+purchaseProduct();

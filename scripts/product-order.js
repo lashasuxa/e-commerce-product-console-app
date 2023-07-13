@@ -1,5 +1,6 @@
 import prompt from "prompt";
 import Product from "../models/product.js";
+import Order from "../models/order.js";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 dotenv.config();
@@ -14,49 +15,50 @@ const connect = async () => {
   }
 };
 
-connect();
-
-const schema = {
-  properties: {
-    quantity: {
-      description: "Order quantity",
-      type: "number",
-      required: true,
+const createOrder = async () => {
+  const schema = {
+    properties: {
+      productId: {
+        description: "Product ID",
+        type: "number",
+        required: true,
+      },
+      quantity: {
+        description: "Product quantity",
+        type: "number",
+        required: true,
+      },
     },
-    productId: {
-      description: "Product ID",
-      type: "number",
-      required: true,
-    },
-  },
-};
+  };
 
-prompt.start();
+  prompt.start();
 
-prompt.get(schema, async function (err, result) {
-  if (err) {
-    console.log(err);
-    return;
-  }
-
-  try {
-    const product = await Product.findOne({ id: result.productId });
-
-    if (!product) {
-      console.log("Product not found");
-      process.exit();
+  prompt.get(schema, async function (err, result) {
+    if (err) {
+      console.log(err);
+      return;
     }
 
-    const orderedQuantity = result.quantity;
-    console.log(`Ordered quantity: ${orderedQuantity}`);
+    try {
+      const product = await Product.findOne({ id: result.productId });
 
-    // Update product quantity and save it to the database
-    product.quantity += orderedQuantity;
-    await product.save();
+      if (!product) {
+        console.log("Product not found");
+        return;
+      }
 
-    console.log("Product order placed successfully!");
-    process.exit();
-  } catch (error) {
-    console.error("Error occurred while placing the product order:", error);
-  }
-});
+      const order = new Order({
+        productId: result.productId,
+        quantity: result.quantity,
+      });
+      await order.save();
+
+      console.log("Order created successfully!");
+    } catch (error) {
+      console.error("Error occurred while creating the order:", error);
+    }
+  });
+};
+
+connect();
+createOrder();
