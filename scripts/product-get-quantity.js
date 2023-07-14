@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import Product from "../models/product.js";
 import prompt from "prompt";
+import dotenv from "dotenv";
+dotenv.config();
 
 const connect = async () => {
   try {
